@@ -1,0 +1,21 @@
+﻿@model Template
+
+@if (@Model?.Columns != null)
+{
+    var expiration = @Model.SuggestedCacheExpiration > TimeSpan.FromSeconds(0) ? @Model.SuggestedCacheExpiration : TimeSpan.FromSeconds(30);
+
+    <ul class="row flex--horizontal">
+        @if (@Model.Columns != null)
+        {
+            foreach (var column in @Model.Columns.ToList())
+            {
+                <li condition="column != null && column.Cards != null" class="col col--@column.Units">
+                    @foreach (var card in column.Cards.ToList())
+                    {
+                       @Html.Partial("_StoryCard", card)
+                    }
+                </li>
+            }
+        }
+    </ul>
+}

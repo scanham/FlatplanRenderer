@@ -1,0 +1,14 @@
+﻿@model List<Flatplan>
+
+<div>
+@foreach(var plan in @Model)
+{ 
+    <div class="container flex--vertical">
+        <h2 class="section--primary">@plan?.Label?.Display</h2>
+        @foreach (var template in plan.Templates)
+        {
+            @Html.Partial("_Template", template);
+        }
+    </div>
+}
+</div>

@@ -1,0 +1,52 @@
+﻿@model StoryCard
+@{
+    var noImageClass = Model?.Images == null || !Model.Images.Any() ? " no-image" : string.Empty;
+}
+
+<div condition="Model != null" class="element element--article@(noImageClass)">
+    @{
+        var showImage = (Model?.Options?.ShowImage).GetValueOrDefault();
+        var showTickers = (Model?.Options?.ShowTickers).GetValueOrDefault();
+        var showByline = (Model?.Options?.ShowByline).GetValueOrDefault();
+        var showSummary = (Model?.Options?.ShowSummary).GetValueOrDefault();
+        var showTimestamp = (Model?.Options?.ShowTimestamp).GetValueOrDefault();
+        var isVideo = Model.Guid.HasValue && Model.Guid.Value != Guid.Empty
+                        && (Model.DocType == 105
+                        || Model.DocType == 115
+                        || Model.DocType == 126);
+        var vidClass = isVideo ? " video" : string.Empty;
+        var videoGuid = isVideo ? Model.Guid.Value.ToString() : null;
+    }
+    <figure condition="showImage" class="article__figure">
+        <a class="figure__image@(vidClass)" data-video-guid="@videoGuid" href="#" model="@Model" title="@Model.Headline">
+            <img condition="Model?.Images != null && Model.Images.Any()" alt="@Model.Headline" images="@Model.Images" />
+            <i condition="isVideo" class="icon--play"></i>
+        </a>
+    </figure>
+    <div class="article__content">
+       
+        <div class="content--primary">
+            @if (Model.Label != null && !string.IsNullOrEmpty(Model.Label.Display))
+            {
+                <h4 class="article__column"><a href="" title="...">Column</a></h4>
+            }
+            <h3 class="article__headline"><a model="@Model" title="@Model.Headline">@Model.Headline</a></h3>
+            <p condition="showSummary || Model?.Images == null || !Model.Images.Any()" class="article__summary">@Model.Summary</p>
+        </div>
+        <div condition="showTickers && Model?.Instruments != null && Model.Instruments.Any()" class="content--secondary">
+            <ul class="article__tickers">
+                @foreach (var instrument in Model.Instruments.Take(3).ToList())
+                {
+                    var shortDisplay = "US".Equals(instrument.Country, StringComparison.OrdinalIgnoreCase) ? instrument.Ticker : instrument.Country + ":" + instrument.Ticker;
+                    var changePercent = 2;//instrument?.Price?.Trading?.Change?.Percent;
+                    <li condition="changePercent != null" class="ticker ticker--@(changePercent >= 0 ? "positive" : "negative")">
+                        <a class="ticker__link" model="@instrument" title="Go to '@shortDisplay' Quote Page">
+                            <span class="ticker__symbol">@shortDisplay</span>
+                            <span class="ticker__percent">@(changePercent)%</span><span class="icon--caret-@(changePercent < 0 ? "down" : changePercent > 0 ? "up" : string.Empty)"></span>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
